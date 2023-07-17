@@ -67,10 +67,6 @@ $ npm test
 - [ ] CICD pipeline via gitlab
 - [ ] Code revamp
 
-## License
-
-  [MIT](LICENSE)
-
 [appveyor-image]: https://badgen.net/appveyor/ci/dougwilson/express/master?label=windows
 [appveyor-url]: https://ci.appveyor.com/project/dougwilson/express
 [coveralls-image]: https://badgen.net/coveralls/c/github/expressjs/express/master
