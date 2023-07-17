@@ -1,10 +1,16 @@
 const mongoose = require('mongoose')
+const moment = require('moment')
 const recipeSchema = new mongoose.Schema({
   itemCode: String,
   displayName: String,
   price: Number,
   category: String,
-  imgSrcUrl: String
+  imgSrcUrl: String,
+  lastUpdated: { type: Date, default: moment() },
+  options: [{
+    type: mongoose.ObjectId,
+    ref: 'OptionGroup'
+  }]
 })
 
 module.exports = mongoose.model('recipes', recipeSchema)

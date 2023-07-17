@@ -1,50 +1,44 @@
+require('dotenv').config()
 const express = require('express')
 const path = require('path')
 const cookieParser = require('cookie-parser')
 const bodyParser = require('body-parser')
-const logger = require('morgan')
+const winston = require('winston')
+const expressWinston = require('express-winston')
 const mongoose = require('mongoose')
-const errorlog = require('express-errorlog')
-const fs = require('fs')
-const accessLogStream = fs.createWriteStream(path.join(__dirname, 'access.log'), { flags: 'a' })
+const cors = require('cors')
 
-
-const usersRouter = require('./routes/users')
-const ordersRouter = require('./routes/orders')
-const recipeRouter = require('./routes/recipe')
-const indexRouter = require('./routes/index')
+const indexRouter = require('./routes/index.route')
 
 const app = express()
-app.use(logger('combined', { stream: accessLogStream }))
+
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({
   extended: true
-}));
+}))
 app.use(cookieParser())
 app.use(express.static(path.join(__dirname, 'public')))
-app.use('/api/users', usersRouter)
-app.use('/api/order', ordersRouter)
-app.use('/api/recipe', recipeRouter)
-app.use('/api', indexRouter)
-app.use(errorlog)
-// Error handling
-app.use((err, req, res, next) => {
-  var errorStream = fs.createWriteStream('./error.log', { flags: 'a' })
-  errorStream.write(JSON.stringify(err))
-  errorStream.write('\n')
-  errorStream.on('end', data => {
-    errorStream.end()
-  })
-  res.json(err)
-})
 
-mongoose.connect(`mongodb://localhost/POS`)
-  .then((() => console.log('mongo connected')))
-  .catch(err => console.log(err))
-require('./models/categories')
-require('./models/category_options')
-require('./models/orders')
-require('./models/recipe')
-require('./models/orders')
+app.use('/api', indexRouter)
+// TODO: add error log
+if (process.env.NODE_ENV === 'development') {
+}
+
+if (process.env.NODE_ENV === 'production') {
+}
+
+// mongoose.set('useNewUrlParser', true)
+// mongoose.set('useUnifiedTopology', true)
+mongoose.connect(
+  `mongodb://${process.env.MONGODB_HOST}:${process.env.MONGODB_PORT}/pos`,
+  {
+    authSource: 'admin',
+    user: process.env.MONGODB_ROOT_USERNAME,
+    pass: process.env.MONGODB_ROOT_PASSWORD
+  }
+)
+.then((() => console.log('mongo connected')))
+.catch(err => console.log(err))
+require('./models/index')
 
 module.exports = app

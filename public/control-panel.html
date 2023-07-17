@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0"
+    />
+    <meta
+      http-equiv="X-UA-Compatible"
+      content="ie=edge"
+    />
+    <meta
+      name="Description"
+      content="Enter your description here"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.0.0-beta1/css/bootstrap.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.2/css/all.min.css"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/dayjs@1/dayjs.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+
+    <title>Control Panel</title>
+  </head>
+  <body>
+    <button class="btn btn-warning">
+      Create
+    </button>
+    <table class="table"></table>
+    <div
+      class="modal fade"
+      id="editModal"
+      tabindex="-1"
+      role="dialog"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">
+              Modal title
+            </h5>
+            <button
+              type="button"
+              class="close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            >
+              <span aria-hidden="true"
+                >&times;</span
+              >
+            </button>
+          </div>
+          <div class="modal-body">
+            <form>
+              <input type="hidden" id="id" />
+              <div class="form-group">
+                <label for="exampleInputEmail1"
+                  >Item Code</label
+                >
+                <input
+                  disabled
+                  class="form-control"
+                  id="itemCode"
+                />
+              </div>
+              <div class="form-group">
+                <label for="displayName"
+                  >Display Name</label
+                >
+                <input
+                  class="form-control"
+                  id="displayName"
+                />
+              </div>
+              <div class="form-group">
+                <label for="price">Price</label>
+                <input
+                  class="form-control"
+                  id="price"
+                  type="number"
+                  placeholder="Price"
+                />
+              </div>
+              <div class="form-group">
+                <label for="imgSrcUrl"
+                  >imgSrcUrl
+                  <button
+                    class="btn btn-info btn-sm btn-preview-img"
+                  >
+                    preview
+                  </button>
+                  <img
+                    style="
+                      border: 1px solid black;
+                    "
+                    src="https://menu.indonesiansatehouse.com/img/%E9%86%89%E9%9B%9E%E7%BF%BC.jpg"
+                    width="50"
+                    alt=""
+                    class="img-fluid preview-img"
+                  />
+                </label>
+                <input
+                  type="url"
+                  class="form-control"
+                  id="imgSrcUrl"
+                />
+              </div>
+              <div class="form-group">
+                <label for="optionGroup"
+                  >options</label
+                >
+                <select
+                  class="form-select optionGroup-select"
+                  style="height: 300px"
+                  multiple
+                  aria-label="multiple select example"
+                ></select>
+              </div>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-bs-dismiss="modal"
+            >
+              Close
+            </button>
+            <button
+              type="button"
+              class="btn btn-primary btn-save-changes"
+            >
+              Save changes
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script src="create-table.js"></script>
+    <script>
+      ;(async function () {
+        let recipe, options
+        async function getData() {
+          let data = await fetch(
+            '/api/recipe'
+          ).then((res) => res.json())
+          recipe = data.recipe
+          options = data.options
+        }
+        function renderTable() {
+          const table =
+            document.querySelector('table')
+
+          $('table').empty()
+          createTableHeader(table, recipe)
+          generateTableContent(table, recipe)
+          $('.btn-edit').on('click', function () {
+            var id = $(this).attr('id')
+            var rowData = recipe.find(
+              (e) => e._id == id
+            )
+            if (rowData === undefined)
+              return alert('No data')
+            $('#editModal').modal('show')
+            updateModal(rowData)
+          })
+        }
+        await getData()
+        renderTable()
+        function updateModal(rowData) {
+          const {
+            displayName,
+            price,
+            imgSrcUrl,
+            options: selectedOptions,
+            itemCode,
+            _id,
+          } = rowData
+          $('#editModal .modal-title').text(
+            `修改 ${displayName}`
+          )
+          $('input#id').val(_id)
+          $('input#itemCode').val(itemCode)
+          $('input#displayName').val(displayName)
+          $('input#price').val(price)
+          $('input#imgSrcUrl').val(imgSrcUrl)
+          $('img.img-fluid').attr(
+            'src',
+            imgSrcUrl
+          )
+          $('.optionGroup-select').empty()
+          options.forEach((option) => {
+            const isSelected =
+              selectedOptions.findIndex(
+                (e) => e._id == option._id
+              ) > -1
+            $('.optionGroup-select').append(
+              `<option ${
+                isSelected ? 'selected' : ''
+              } value="${option._id}">${
+                option.title
+              }</option>`
+            )
+          })
+        }
+        $('.btn-preview-img').on(
+          'click',
+          function (e) {
+            e.preventDefault()
+            const img =
+              document.createElement('img')
+            img.src = $('#imgSrcUrl').val()
+            img.width = 50
+            img.style.border = '1px solid red'
+            img.classList.add('img-fluid')
+            img.classList.add('new-img-preview')
+            $(this).after(img)
+          }
+        )
+        $('.btn-save-changes').on(
+          'click',
+          function () {
+            const _id = $('#id').val()
+            const itemCode = $('#itemCode').val()
+            const displayName = $(
+              '#displayName'
+            ).val()
+            const price = $('#price').val()
+            const imgSrcUrl =
+              $('#imgSrcUrl').val()
+            const options = $(
+              '.optionGroup-select'
+            ).val()
+            $('.btn-save-changes').empty()
+            $('.btn-save-changes').append(
+              `<div class="spinner-border" role="status"><span class="sr-only">Loading...</span></div>`
+            )
+            $('.btn-save-changes')
+            updateRowData({
+              itemCode,
+              displayName,
+              price,
+              imgSrcUrl,
+              options,
+              _id,
+            })
+              .then(async () => {
+                await getData()
+                renderTable()
+                $('#editModal').modal('hide')
+                $('.new-img-preview').remove()
+                $('.btn-save-changes').empty()
+                $('.btn-save-changes').append(
+                  `Save Changes`
+                )
+              })
+              .catch((err) => {
+                alert(err)
+              })
+          }
+        )
+        function updateRowData({
+          displayName,
+          price,
+          imgSrcUrl,
+          options,
+          _id,
+          itemCode,
+        }) {
+          return fetch(`/api/recipe/${_id}`, {
+            method: 'PUT',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              displayName,
+              price,
+              imgSrcUrl,
+              options,
+              itemCode,
+            }),
+          }).then(async (res) => {
+            const json = await res.json()
+            if (!res.ok) {
+              throw new Error(json.message)
+            }
+          })
+        }
+      })()
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/2.5.4/umd/popper.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.0.0-beta1/js/bootstrap.min.js"></script>
+  </body>
+</html>

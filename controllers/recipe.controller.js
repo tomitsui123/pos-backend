@@ -1,18 +1,38 @@
-const async = require('async')
-const mongoQuery = require('../others/mongoQuery')
-const _ = require('lodash')
-const Recipe = require('../models/recipe.model')
+const moment = require('moment')
+const Recipe = require('../models/recipes.model')
+const optionGroup = require('../models/optionGroup.model')
 
 const getAllRecipe = async (req, res, next) => {
   try {
-    const recipe = await Recipe.find()
-    // const recipe = await Recipe.aggregate(mongoQuery.getRecipe).sort("category")
-    return res.send(recipe)
+    recipe = await Recipe.find().populate('options')
+    const options = await optionGroup.find()
+    return res.status(200).json({
+      recipe, options
+    })
   } catch (e) {
     next(e)
   }
 }
 
+const editRecipe = async (req, res, next) => {
+  console.log('edit recipe', req.params.id)
+  const { id } = req.params
+  let input = req.body
+  try {
+    const out = await Recipe.findOneAndUpdate({ _id: id }, {
+      ...input, lastUpdated: moment(), "$set": {
+        "options": input.options
+      }
+    }, { new: true })
+    return res.status(200).json({
+      message: 'Recipe has been updated',
+      data: out
+    })
+  } catch (e) {
+    console.error(e)
+    next(e)
+  }
+}
 const createNewItem = async (req, res, next) => {
   const input = req.body
   try {
@@ -26,5 +46,6 @@ const createNewItem = async (req, res, next) => {
 
 module.exports = {
   getAllRecipe,
-  createNewItem
+  createNewItem,
+  editRecipe
 }

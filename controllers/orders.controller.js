@@ -1,6 +1,6 @@
 const moment = require('moment')
-const Orders = require('../models/orders')
-const Log = require('../models/log')
+const Orders = require('../models/orders.model')
+const Log = require('../models/log.model')
 const mongoose = require('mongoose')
 const _ = require('lodash')
 
