@@ -4,16 +4,26 @@ const Log = require('../models/log')
 const mongoose = require('mongoose')
 const _ = require('lodash')
 
+const logCreator = async (action, changedItems = {}) => {
+  if (!['create', 'edit', 'delete'].includes(action)) return Error('Log action is not correct')
+  try {
+    const log = Log({ datetime: moment(), action, changedItems })
+    await log.save()
+  } catch (e) {
+    console.log(e)
+  }
+  console.log('success')
+  return { loggedTime: moment(), changedItems, action }
+}
+
 module.exports.getOrder = async () => {
-  console.log('getOrder')
   const orders = await Orders.find()
-  return  orders
+  return orders
 }
 
 module.exports.getOrderById = async (id) => {
-  if (!mongoose.Types.ObjectId.isValid(id)) return Error('The id is invalid')
   const orders = await Orders.findById(id)
-  return  orders
+  return orders
 }
 
 module.exports.getOrderByDate = async (date) => {
@@ -25,19 +35,7 @@ module.exports.getOrderByDate = async (date) => {
       $lte: moment(date).endOf('day')
     }
   })
-  return  orders
-}
-
-const logCreator = async (action, changedItems = {}) => {
-  if (!['create', 'edit', 'delete'].includes(action)) return Error('Log action is not correct')
-  try {
-    const log = Log({datetime: moment(), action, changedItems})
-    await log.save()
-  } catch(e) {
-    console.log(e)
-  }
-  console.log('success')
-  return { loggedTime: moment(), changedItems, action }
+  return orders
 }
 
 module.exports.createOrder = async input => {
@@ -61,20 +59,20 @@ module.exports.createOrder = async input => {
     logCreator('create', input)
     const savedOrder = await order.save()
     return savedOrder._id
-  } catch(e) {
+  } catch (e) {
     console.log(e)
     return Error(e)
   }
 }
 
-module.exports.updateOrder  = async (id, updatedContent) => {
+module.exports.updateOrder = async (id, updatedContent) => {
   const checkUpdatedContent = checkedContent => {
     console.log(checkedContent, '<====== gotcha')
     const keyList = Object.keys(checkedContent)
     for (let i = 0; i < keyList.length; i++) {
       if (!['itemList', 'totalAmount',
-      'telephone', 'priority', 'paid',
-      'remarks', 'deleted', 'deletedAt', 'createdAt', 'updatedAt'].includes(keyList[i])) {
+        'telephone', 'priority', 'paid',
+        'remarks', 'deleted', 'deletedAt', 'createdAt', 'updatedAt'].includes(keyList[i])) {
         return keyList[i]
       }
     }
@@ -90,7 +88,7 @@ module.exports.updateOrder  = async (id, updatedContent) => {
       return new Error(`The order(id:${id}) cannot be changed`)
     }
     logCreator('edit', updatedContent)
-  } catch(e) {
+  } catch (e) {
     return Error(e)
   }
   return {

@@ -1,10 +1,10 @@
 const mongoose = require('mongoose')
-var Schema = mongoose.Schema
 const recipeSchema = new mongoose.Schema({
   itemCode: String,
   displayName: String,
   price: Number,
-  category: String
+  category: String,
+  imgSrcUrl: String
 })
 
 module.exports = mongoose.model('recipes', recipeSchema)

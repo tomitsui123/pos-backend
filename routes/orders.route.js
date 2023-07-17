@@ -5,14 +5,14 @@ const multer = require('multer')
 const upload = multer()
 const _ = require('lodash')
 
-const orderController = require('../controllers/orders')
+const orderController = require('../controllers/orders.controller')
 
 router.get('/', async (_req, res, _next) => {
   const orders = await orderController.getOrder()
   res.send(orders)
 })
 
-router.get('/id::id', async (req, res, next) => {
+router.get('/:id', async (req, res, next) => {
   const { id } = req.params
   try {
     var orders = await orderController.getOrderById(id)
@@ -25,7 +25,8 @@ router.get('/id::id', async (req, res, next) => {
   }
 })
 
-router.get('/date::date', async (req, res, next) => {
+router.get('/:date', async (req, res, next) => {
+  // date format: YYYY-MM-DD
   try {
     var { date } = req.params
     var orders = await orderController.getOrderByDate(date)
