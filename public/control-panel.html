@@ -74,6 +74,7 @@
                   >名稱</label
                 >
                 <input
+                  disabled
                   class="form-control"
                   id="displayName"
                 />
@@ -106,6 +107,7 @@
                   />
                 </label>
                 <input
+                  disabled
                   type="url"
                   class="form-control"
                   id="imgSrcUrl"
@@ -116,6 +118,7 @@
                   >選項</label
                 >
                 <select
+                  disabled
                   class="form-select optionGroup-select"
                   style="height: 300px"
                   multiple
@@ -143,6 +146,38 @@
       </div>
     </div>
     <script src="create-table.js"></script>
+    <div
+      class="toast-container position-fixed bottom-0 end-0 p-3"
+    >
+      <div
+        id="liveToast"
+        class="toast"
+        role="alert"
+        aria-live="assertive"
+        aria-atomic="true"
+      >
+        <div class="toast-header">
+          <img
+            src="..."
+            class="rounded me-2"
+            alt="..."
+          />
+          <strong class="me-auto"
+            >Bootstrap</strong
+          >
+          <small>11 mins ago</small>
+          <button
+            type="button"
+            class="btn-close"
+            data-bs-dismiss="toast"
+            aria-label="Close"
+          ></button>
+        </div>
+        <div class="toast-body">
+          Hello, world! This is a toast message.
+        </div>
+      </div>
+    </div>
     <script>
       ;(async function () {
         let recipe, options
@@ -152,6 +187,32 @@
           ).then((res) => res.json())
           recipe = data.recipe
           options = data.options
+        }
+        async function checkPassword() {
+          let password = prompt('請輸入密碼')
+          try {
+            const data = await fetch(
+              '/api/user/verify',
+              {
+                method: 'POST',
+                headers: {
+                  'Content-Type':
+                    'application/json',
+                },
+                body: JSON.stringify({
+                  password,
+                }),
+              }
+            )
+            if (data.status !== 200)
+              throw new Error('密碼錯誤')
+            const object = await data.json()
+            token = object.data.token
+            localStorage.setItem('token', token)
+          } catch (e) {
+            console.error(e)
+            alert('密碼錯誤')
+          }
         }
         function renderTable() {
           const table =
@@ -171,8 +232,34 @@
             updateModal(rowData)
           })
         }
-        await getData()
-        renderTable()
+        function updateRowData({
+          displayName,
+          price,
+          imgSrcUrl,
+          options,
+          _id,
+          itemCode,
+        }) {
+          return fetch(`/api/recipe/${_id}`, {
+            method: 'PUT',
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify({
+              displayName,
+              price,
+              imgSrcUrl,
+              options,
+              itemCode,
+            }),
+          }).then(async (res) => {
+            const json = await res.json()
+            if (!res.ok) {
+              throw new Error(json.message)
+            }
+          })
+        }
         function updateModal(rowData) {
           const {
             displayName,
@@ -209,6 +296,19 @@
             )
           })
         }
+        async function main() {
+          await getData()
+          renderTable()
+        }
+        let token = localStorage.getItem('token')
+        if (!token) {
+          await checkPassword()
+        }
+        console.log(token)
+        if (token) {
+          await main()
+        }
+
         $('.btn-preview-img').on(
           'click',
           function (e) {
@@ -262,36 +362,11 @@
               })
               .catch((err) => {
                 alert(err)
+                localStorage.setItem('token', '')
+                location.reload()
               })
           }
         )
-        function updateRowData({
-          displayName,
-          price,
-          imgSrcUrl,
-          options,
-          _id,
-          itemCode,
-        }) {
-          return fetch(`/api/recipe/${_id}`, {
-            method: 'PUT',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-              displayName,
-              price,
-              imgSrcUrl,
-              options,
-              itemCode,
-            }),
-          }).then(async (res) => {
-            const json = await res.json()
-            if (!res.ok) {
-              throw new Error(json.message)
-            }
-          })
-        }
       })()
     </script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/2.5.4/umd/popper.min.js"></script>

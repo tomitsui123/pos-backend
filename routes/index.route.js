@@ -25,7 +25,7 @@ const notFound = (_req, res, _next) => {
 router.use((err, _req, res, _next) => {
   console.error(err.stack)
   res.status(500).json({
-    message: 'Server error',
+    message: err.message,
   })
 })
 

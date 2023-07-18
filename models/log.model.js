@@ -1,9 +1,13 @@
 const mongoose = require('mongoose')
-var Schema = mongoose.Schema
 const logSchema = new mongoose.Schema({
-  datetime: Date,
-  action: String,
-  changedItems: Object
+  method: String,
+  url: String,
+  message: String,
+  params: Object,
+  query: Object,
+  body: Object,
+  status: Number,
+  createdAt: Date,
 })
 
-module.exports = mongoose.model('log', logSchema)
+module.exports = mongoose.model('logs', logSchema)

@@ -1,26 +1,25 @@
 const express = require('express')
 const router = express.Router()
-var moment = require('moment')
 const multer = require('multer')
 const upload = multer()
 const _ = require('lodash')
 
-const orderController = require('../controllers/orders.controller')
+const { createOrder, getOrder, getOrderById, getOrderByDate, deleteOrder, updateOrder } = require('../controllers/orders.controller')
 
 router.get('/', async (_req, res, _next) => {
-  const orders = await orderController.getOrder()
+  const orders = await getOrder()
   res.send(orders)
 })
 
 router.get('/:id', async (req, res, next) => {
   const { id } = req.params
   try {
-    var orders = await orderController.getOrderById(id)
+    var orders = await getOrderById(id)
     if (orders instanceof Error) {
       orders = null
     }
     return res.send(orders ? [orders] : [])
-  } catch(e) {
+  } catch (e) {
     return next(e)
   }
 })
@@ -29,30 +28,22 @@ router.get('/:date', async (req, res, next) => {
   // date format: YYYY-MM-DD
   try {
     var { date } = req.params
-    var orders = await orderController.getOrderByDate(date)
+    var orders = await getOrderByDate(date)
     if (orders instanceof Error) {
       console.log(orders)
       orders = null
     }
     return res.send(orders ? orders : [])
-  } catch(e) {
+  } catch (e) {
     return next(e)
   }
 })
 
-router.post('/', upload.array(), async (req, res) => {
-  const input = req.body
-  const createdId = await orderController.createOrder(input)
-  if (createdId instanceof Error) {
-    const { message } = createdId
-    return res.status(500).send({ message })
-  }
-  return res.send({ message: 'Order has been saved', id: createdId })
-})
+router.post('/', upload.array(), createOrder)
 
 router.post('/revert/:id', async (req, res, next) => {
   var { id } = req.params
-  var out = await orderController.revertOrder(id)
+  var out = await revertOrder(id)
   if (out instanceof Error) {
     return next(out)
   } else {
@@ -60,22 +51,11 @@ router.post('/revert/:id', async (req, res, next) => {
   }
 })
 
-router.put('/:id', async (req, res, next) => {
-  // TODO: compare changes
-  // TODO: use mocha to prepare test script
-  console.log('hi')
-  const { id } = req.params
-  const out = await orderController.updateOrder(id, req.body)
-  if (out instanceof Error) {
-    return next(out)
-  } else {
-    return res.send(out)
-  }
-})
+router.put('/:id', updateOrder)
 
 router.delete('/:id', async (req, res, next) => {
   const _id = req.params.id
-  const message = await orderController.deleteOrder(_id)
+  const message = await deleteOrder(_id)
   if (message instanceof Error) {
     return next(message)
   }

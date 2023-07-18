@@ -3,12 +3,10 @@ const express = require('express')
 const path = require('path')
 const cookieParser = require('cookie-parser')
 const bodyParser = require('body-parser')
-const winston = require('winston')
-const expressWinston = require('express-winston')
 const mongoose = require('mongoose')
-const cors = require('cors')
 
 const indexRouter = require('./routes/index.route')
+const { logToDatabase } = require('./middlewares/logging.middleware')
 
 const app = express()
 
@@ -18,7 +16,7 @@ app.use(bodyParser.urlencoded({
 }))
 app.use(cookieParser())
 app.use(express.static(path.join(__dirname, 'public')))
-
+app.use(logToDatabase)
 app.use('/api', indexRouter)
 // TODO: add error log
 if (process.env.NODE_ENV === 'development') {
@@ -37,8 +35,8 @@ mongoose.connect(
     pass: process.env.MONGODB_ROOT_PASSWORD
   }
 )
-.then((() => console.log('mongo connected')))
-.catch(err => console.log(err))
+  .then((() => console.log('mongo connected')))
+  .catch(err => console.log(err))
 require('./models/index')
 
 module.exports = app

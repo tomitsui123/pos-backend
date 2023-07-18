@@ -24,7 +24,10 @@ const itemSchema = new mongoose.Schema({
   menuProperty: MenuProperty,
   amount: Number,
   price: Number,
-  remarkList: [String],
+  remarkList: [{
+    content: String,
+    title: String
+  }],
   isTakeAway: Boolean
 })
 

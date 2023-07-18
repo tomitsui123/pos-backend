@@ -1,6 +1,7 @@
 const moment = require('moment')
 const Recipe = require('../models/recipes.model')
 const optionGroup = require('../models/optionGroup.model')
+const jwt = require('jsonwebtoken')
 
 const getAllRecipe = async (req, res, next) => {
   try {
@@ -15,10 +16,9 @@ const getAllRecipe = async (req, res, next) => {
 }
 
 const editRecipe = async (req, res, next) => {
-  console.log('edit recipe', req.params.id)
-  const { id } = req.params
-  let input = req.body
   try {
+    const { id } = req.params
+    let input = req.body
     const out = await Recipe.findOneAndUpdate({ _id: id }, {
       ...input, lastUpdated: moment(), "$set": {
         "options": input.options
