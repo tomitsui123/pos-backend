@@ -11,16 +11,16 @@ services:
       MONGO_INITDB_ROOT_PASSWORD: ${MONGODB_ROOT_PASSWORD}
     volumes:
       - ./data:/data/db
-  # shop-pos-backend:
-  #   build:
-  #     context: .
-  #     dockerfile: Dockerfile 
-  #   container_name: shop-pos-backend
-  #   ports:
-  #     - 8080:80
-  #   restart: always
-  #   depends_on:
-  #     - shop-mongo
-  #   environment:
-  #     MONGO_INITDB_ROOT_USERNAME: ${MONGODB_ROOT_USERNAME}
-  #     MONGO_INITDB_ROOT_PASSWORD: ${MONGODB_ROOT_PASSWORD}
+  shop-pos-backend:
+    build:
+      context: .
+      dockerfile: Dockerfile 
+    container_name: shop-pos-backend
+    ports:
+      - 8080:80
+    restart: always
+    depends_on:
+      - shop-mongo
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGODB_ROOT_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGODB_ROOT_PASSWORD}
