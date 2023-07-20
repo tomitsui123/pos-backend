@@ -29,7 +29,7 @@ module.exports.createOrder = async (req, res, next) => {
   try {
     const order = await Orders({ ...(req.body) })
     await order.save()
-    return res.send({ message: 'Order has been saved', order })
+    return res.send({ message: 'Order has been saved', order, id: order._id })
   } catch (e) {
     if (e instanceof mongoose.Error.ValidationError) {
       console.error(e)
