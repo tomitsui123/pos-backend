@@ -15,7 +15,7 @@ db.createCollection('users', { capped: false })
 db.createCollection('logs', { capped: false })
 db.createCollection('additional_cost', { capped: false })
 db.createCollection('categories', { capped: false })
-db.createCollection('options', { capped: false })
+db.createCollection('optiongroups', { capped: false })
 db.createCollection('item', { capped: false })
 db.createCollection('recipes', { capped: false })
 
@@ -84,7 +84,7 @@ db.categories.insert([
 
 ])
 
-db.getCollection('category_options').insert([
+db.getCollection('optiongroups').insert([
   {
     "_id": ObjectId("5efb7071e6c291823ae7a03f"),
     "title": "辣度",
