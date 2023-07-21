@@ -19,16 +19,10 @@ app.use(express.static(path.join(__dirname, 'public')))
 app.use(logToDatabase)
 app.use('/api', indexRouter)
 // TODO: add error log
-if (process.env.NODE_ENV === 'development') {
-}
 
-if (process.env.NODE_ENV === 'production') {
-}
-
-// mongoose.set('useNewUrlParser', true)
-// mongoose.set('useUnifiedTopology', true)
+const host = process.env.NODE_ENV === 'production' ? 'shop-mongo' : process.env.MONGODB_HOST
 mongoose.connect(
-  `mongodb://${process.env.MONGODB_HOST}:${process.env.MONGODB_PORT}/pos`,
+  `mongodb://${host}:${process.env.MONGODB_PORT}/pos`,
   {
     authSource: 'admin',
     user: process.env.MONGODB_ROOT_USERNAME,
