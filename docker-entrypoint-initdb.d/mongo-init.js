@@ -15,7 +15,7 @@ db.createCollection('users', { capped: false })
 db.createCollection('logs', { capped: false })
 db.createCollection('additional_cost', { capped: false })
 db.createCollection('categories', { capped: false })
-db.createCollection('category_options', { capped: false })
+db.createCollection('options', { capped: false })
 db.createCollection('item', { capped: false })
 db.createCollection('recipes', { capped: false })
 
