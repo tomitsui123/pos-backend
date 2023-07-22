@@ -5,7 +5,7 @@ const jwt = require('jsonwebtoken')
 
 const getAllRecipe = async (req, res, next) => {
   try {
-    recipe = await Recipe.find().populate('options')
+    recipe = await Recipe.find().populate('additionalCost').populate('options')
     const options = await optionGroup.find()
     return res.status(200).json({
       recipe, options

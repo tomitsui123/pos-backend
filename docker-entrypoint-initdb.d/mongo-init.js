@@ -13,7 +13,7 @@ db = new Mongo().getDB("pos")
 
 db.createCollection('users', { capped: false })
 db.createCollection('logs', { capped: false })
-db.createCollection('additional_cost', { capped: false })
+db.createCollection('additionalcosts', { capped: false })
 db.createCollection('categories', { capped: false })
 db.createCollection('optiongroups', { capped: false })
 db.createCollection('item', { capped: false })
@@ -81,7 +81,6 @@ db.categories.insert([
       "飲品"
     ]
   }
-
 ])
 
 db.getCollection('optiongroups').insert([
@@ -264,7 +263,7 @@ db.getCollection('optiongroups').insert([
 
 ])
 
-db.getCollection('additional_cost').insert([
+db.getCollection('additionalcosts').insert([
   {
     "_id": ObjectId("5efd4ff67a27366989acf8a1"),
     "title": "加底",
@@ -630,6 +629,10 @@ db.recipes.insert(
       "imgSrcUrl": "http://menu.indonesiansatehouse.com/img/通.jpg",
       "options": [
         "5efb71bae6c291823ae7a152"
+      ],
+      "additionalCost": [
+        "5efd4ff67a27366989acf8a1",
+        "5efd4ff67a27366989acf8a4"
       ]
     },
     {
@@ -641,6 +644,10 @@ db.recipes.insert(
       "imgSrcUrl": "http://menu.indonesiansatehouse.com/img/生.jpg",
       "options": [
         "5efb71bae6c291823ae7a152"
+      ],
+      "additionalCost": [
+        "5efd4ff67a27366989acf8a1",
+        "5efd4ff67a27366989acf8a4"
       ]
     },
     {
@@ -652,6 +659,10 @@ db.recipes.insert(
       "imgSrcUrl": "http://menu.indonesiansatehouse.com/img/椰.jpg",
       "options": [
         "5efb71bae6c291823ae7a152"
+      ],
+      "additionalCost": [
+        "5efd4ff67a27366989acf8a1",
+        "5efd4ff67a27366989acf8a4"
       ]
     },
     {
@@ -663,6 +674,10 @@ db.recipes.insert(
       "imgSrcUrl": "http://menu.indonesiansatehouse.com/img/娃.jpg",
       "options": [
         "5efb71bae6c291823ae7a152"
+      ],
+      "additionalCost": [
+        "5efd4ff67a27366989acf8a1",
+        "5efd4ff67a27366989acf8a4"
       ]
     },
     {
@@ -674,6 +689,10 @@ db.recipes.insert(
       "imgSrcUrl": "http://menu.indonesiansatehouse.com/img/雜才.jpg",
       "options": [
         "5efb71bae6c291823ae7a152"
+      ],
+      "additionalCost": [
+        "5efd4ff67a27366989acf8a1",
+        "5efd4ff67a27366989acf8a4"
       ]
     },
     {
@@ -802,6 +821,10 @@ db.recipes.insert(
         "5efd4f2c7a27366989acf838",
         "5efd51767a27366989acf96e",
         "5efd51767a27366989acf96b"
+      ],
+      "additionalCost": [
+        "5efd4ff67a27366989acf8a1",
+        "5efd4ff67a27366989acf8a4"
       ]
     },
     {
@@ -818,6 +841,10 @@ db.recipes.insert(
         "5efd4f2c7a27366989acf838",
         "5efd51767a27366989acf96e",
         "5efd51767a27366989acf96b"
+      ],
+      "additionalCost": [
+        "5efd4ff67a27366989acf8a1",
+        "5efd4ff67a27366989acf8a4"
       ]
     },
     {
@@ -834,6 +861,10 @@ db.recipes.insert(
         "5efd4f2c7a27366989acf838",
         "5efd51767a27366989acf96e",
         "5efd51767a27366989acf96b"
+      ],
+      "additionalCost": [
+        "5efd4ff67a27366989acf8a1",
+        "5efd4ff67a27366989acf8a4"
       ]
     },
     {
@@ -850,6 +881,10 @@ db.recipes.insert(
         "5efd4f2c7a27366989acf838",
         "5efd51767a27366989acf96e",
         "5efd51767a27366989acf96b"
+      ],
+      "additionalCost": [
+        "5efd4ff67a27366989acf8a1",
+        "5efd4ff67a27366989acf8a4"
       ]
     },
     {
@@ -866,6 +901,10 @@ db.recipes.insert(
         "5efd4f2c7a27366989acf838",
         "5efd51767a27366989acf96e",
         "5efd51767a27366989acf96b"
+      ],
+      "additionalCost": [
+        "5efd4ff67a27366989acf8a1",
+        "5efd4ff67a27366989acf8a4"
       ]
     },
     {
@@ -975,6 +1014,10 @@ db.recipes.insert(
         "5efd4f2c7a27366989acf838",
         "5efd51767a27366989acf96e",
         "5efd51767a27366989acf96b"
+      ],
+      "additionalCost": [
+        "5efd4ff67a27366989acf8a1",
+        "5efd4ff67a27366989acf8a4"
       ]
     },
     {
@@ -991,6 +1034,10 @@ db.recipes.insert(
         "5efd4f2c7a27366989acf838",
         "5efd51767a27366989acf96e",
         "5efd51767a27366989acf96b"
+      ],
+      "additionalCost": [
+        "5efd4ff67a27366989acf8a1",
+        "5efd4ff67a27366989acf8a4"
       ]
     },
     {
@@ -1007,6 +1054,10 @@ db.recipes.insert(
         "5efd4f2c7a27366989acf838",
         "5efd51767a27366989acf96e",
         "5efd51767a27366989acf96b"
+      ],
+      "additionalCost": [
+        "5efd4ff67a27366989acf8a1",
+        "5efd4ff67a27366989acf8a4"
       ]
     },
     {
@@ -1023,6 +1074,10 @@ db.recipes.insert(
         "5efd4f2c7a27366989acf838",
         "5efd51767a27366989acf96e",
         "5efd51767a27366989acf96b"
+      ],
+      "additionalCost": [
+        "5efd4ff67a27366989acf8a1",
+        "5efd4ff67a27366989acf8a4"
       ]
     },
     {
@@ -1039,6 +1094,10 @@ db.recipes.insert(
         "5efd4f2c7a27366989acf838",
         "5efd51767a27366989acf96e",
         "5efd51767a27366989acf96b"
+      ],
+      "additionalCost": [
+        "5efd4ff67a27366989acf8a1",
+        "5efd4ff67a27366989acf8a4"
       ]
     },
     {

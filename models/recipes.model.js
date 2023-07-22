@@ -6,6 +6,10 @@ const recipeSchema = new mongoose.Schema({
   price: Number,
   category: String,
   imgSrcUrl: String,
+  additionalCost: [{
+    type: mongoose.ObjectId,
+    ref: 'AdditionalCost'
+  }],
   lastUpdated: { type: Date, default: moment() },
   options: [{
     type: mongoose.ObjectId,
