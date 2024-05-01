@@ -3,6 +3,7 @@ const Orders = require('../models/orders.model')
 const mongoose = require('mongoose')
 const _ = require('lodash')
 const logger = require('../utils/logger')
+require('moment-timezone')
 
 module.exports.getOrder = async () => {
   const orders = await Orders.find()
@@ -16,36 +17,31 @@ module.exports.getOrderById = async (id) => {
 
 module.exports.getOrderByDate = async (date) => {
   if (!moment(date).isValid()) return Error('The date format is not correct')
-  date = moment(date)
+  const startDate = moment(`${date} 23:00:00`, 'YYYY-MM-DD HH:mm:ss')
+  const endDate = moment(startDate).add(9, 'hours')
   const orders = await Orders.find({
     createdAt: {
-      $gte: moment(date).startOf('day'),
-      $lte: moment(date).endOf('day')
+      $gte: startDate,
+      $lt: endDate
     }
   })
   return orders
 }
 
 module.exports.createOrder = async input => {
-  try {
-    if (input instanceof Error) {
-      return input
-    }
-    const restructureInput = {
-      ...input, itemList: input.itemList.map(item => ({ ...item, price: item.menuProperty.price }))
-    }
-    const order = await Orders({ ...restructureInput })
-    const savedOrder = await order.save()
-    return savedOrder._id
-  } catch (e) {
-    logger.error(e)
-    return Error(e)
+  if (input instanceof Error) {
+    return input
   }
+  const restructureInput = {
+    ...input, itemList: input.itemList.map(item => ({ ...item, price: item.menuProperty.price }))
+  }
+  const order = await Orders({ ...restructureInput })
+  const savedOrder = await order.save()
+  return savedOrder._id
 }
 
 module.exports.updateOrder = async (id, updatedContent) => {
   const checkUpdatedContent = checkedContent => {
-    logger.info(checkedContent, '<====== gotcha')
     const keyList = Object.keys(checkedContent)
     for (let i = 0; i < keyList.length; i++) {
       if (!['itemList', 'totalAmount',

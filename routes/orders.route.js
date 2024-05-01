@@ -2,6 +2,7 @@ const express = require('express')
 const router = express.Router()
 const multer = require('multer')
 const upload = multer()
+const logger = require('../utils/logger')
 
 const { createOrder, getOrderByDate, deleteOrder } = require('../controllers/orders.controller')
 
@@ -15,6 +16,13 @@ router.get('/:date', async (req, res, next) => {
   try {
     var { date } = req.params
     var orders = await getOrderByDate(date)
+    const total = orders.reduce((acc, cur) => {
+      const { itemList } = cur
+      cur.total = itemList.reduce((acc, cur) => {
+        return acc + cur.price
+      }, 0)
+      return acc + cur.total
+    }, 0)
     if (orders instanceof Error) {
       logger.info(orders)
       orders = null
@@ -25,7 +33,15 @@ router.get('/:date', async (req, res, next) => {
   }
 })
 
-router.post('/', upload.array(), createOrder)
+router.post('/', upload.array(), async (req, res) => {
+  try {
+    await createOrder(req.body)
+  } catch (error) {
+    logger.error(error.message)
+    return res.status(500).send({ message: 'order cannot be created' })
+  }
+
+})
 
 router.post('/revert/:id', async (req, res, next) => {
   var { id } = req.params
