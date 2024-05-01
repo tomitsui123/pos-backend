@@ -2,6 +2,7 @@ const mongoose = require('mongoose')
 const mongooseDelete = require('mongoose-delete')
 const moment = require('moment')
 
+
 const OptionProperty = new mongoose.Schema({
   title: String,
   type: String,
@@ -29,13 +30,6 @@ const itemSchema = new mongoose.Schema({
     title: String
   }],
   isTakeAway: Boolean
-})
-
-const logSchema = new mongoose.Schema({
-  loggedTime: Date,
-  action: String,
-  api: String,
-  changedItems: Object
 })
 
 const orderSchema = new mongoose.Schema({

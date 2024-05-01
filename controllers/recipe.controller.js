@@ -1,7 +1,7 @@
 const moment = require('moment')
 const Recipe = require('../models/recipes.model')
 const optionGroup = require('../models/optionGroup.model')
-const jwt = require('jsonwebtoken')
+const logger = require('../utils/logger')
 
 const getAllRecipe = async (req, res, next) => {
   try {
@@ -16,6 +16,7 @@ const getAllRecipe = async (req, res, next) => {
 }
 
 const editRecipe = async (req, res, next) => {
+
   try {
     const { id } = req.params
     let input = req.body
@@ -40,7 +41,7 @@ const createNewItem = async (req, res, next) => {
     await recipe.save()
     return res.send({ message: 'Recipe has been saved', id: recipe._id })
   } catch (e) {
-    console.log(e)
+    logger.info(e)
   }
 }
 

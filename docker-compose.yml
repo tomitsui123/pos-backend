@@ -15,19 +15,20 @@ services:
       - ./data:/data/db
       - ./docker-entrypoint-initdb.d/mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
   shop-pos-backend:
-    env_file:
-      - .env
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile 
     container_name: shop-pos-backend
+    volumes:
+      - ./:/usr/src/app/
     ports:
       - 8080:80
     restart: always
-    volumes:
-      - ./:/usr/src/app
     depends_on:
       - shop-mongo
+    env_file:
+      - .env
     environment:
       MONGO_INITDB_ROOT_USERNAME: ${MONGODB_ROOT_USERNAME}
       MONGO_INITDB_ROOT_PASSWORD: ${MONGODB_ROOT_PASSWORD}
+>>>>>>> 02a09ea (lastest update)

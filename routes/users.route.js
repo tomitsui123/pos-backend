@@ -1,5 +1,6 @@
 var express = require('express')
 const jwt = require('jsonwebtoken')
+const logger = require('../utils/logger')
 var router = express.Router()
 
 /* GET users listing. */
@@ -36,7 +37,7 @@ router.post('/verify', async function (req, res, next) {
 })
 
 router.post('/login', function (req, res, next) {
-  console.log(req.body)
+  logger.info(req.body)
   const { staffId } = req.body
   if (staffId == '11111111') {
     return res.send('login success')

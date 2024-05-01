@@ -2,6 +2,7 @@ const moment = require('moment')
 const Orders = require('../models/orders.model')
 const mongoose = require('mongoose')
 const _ = require('lodash')
+const logger = require('../utils/logger')
 
 module.exports.getOrder = async () => {
   const orders = await Orders.find()
@@ -25,30 +26,45 @@ module.exports.getOrderByDate = async (date) => {
   return orders
 }
 
-module.exports.createOrder = async (req, res, next) => {
+module.exports.createOrder = async input => {
   try {
-    const order = await Orders({ ...(req.body) })
-    await order.save()
-    return res.send({ message: 'Order has been saved', order, id: order._id })
-  } catch (e) {
-    if (e instanceof mongoose.Error.ValidationError) {
-      console.error(e)
-      next(Error("The input is not correct"))
-    } else {
-      next(e)
+    if (input instanceof Error) {
+      return input
     }
+    const restructureInput = {
+      ...input, itemList: input.itemList.map(item => ({ ...item, price: item.menuProperty.price }))
+    }
+    const order = await Orders({ ...restructureInput })
+    const savedOrder = await order.save()
+    return savedOrder._id
+  } catch (e) {
+    logger.error(e)
+    return Error(e)
   }
 }
 
-module.exports.updateOrder = async (req, res, next) => {
+module.exports.updateOrder = async (id, updatedContent) => {
+  const checkUpdatedContent = checkedContent => {
+    logger.info(checkedContent, '<====== gotcha')
+    const keyList = Object.keys(checkedContent)
+    for (let i = 0; i < keyList.length; i++) {
+      if (!['itemList', 'totalAmount',
+        'telephone', 'priority', 'paid',
+        'remarks', 'deleted', 'deletedAt', 'createdAt', 'updatedAt'].includes(keyList[i])) {
+        return keyList[i]
+      }
+    }
+    return true
+  }
   try {
-    const { id } = req.params
-    const data = await updateOrder(id, req.body)
-    await Orders.findOneAndUpdate({ _id: id }, { ...updatedContent, updatedAt: moment() })
-    return res.json({
-      message: `Order has been updated`,
-      data
-    })
+    const checking = checkUpdatedContent(updatedContent)
+    if (!checking) {
+      return new Error(`The key (${checking}) is not found`)
+    }
+    const updatedInfo = await Orders.updateOne({ _id: id }, { ...updatedContent, updatedAt: moment() })
+    if (!updatedInfo.n) {
+      return new Error(`The order(id:${id}) cannot be changed`)
+    }
   } catch (e) {
     next(e)
   }
@@ -71,7 +87,6 @@ module.exports.deleteOrder = async _id => {
   if (!checking) {
     return Error(`id ${_id} has been deleted.`)
   } else {
-    logCreator('create')
     checking.save()
   }
   return Error(`deleted order(id: ${_id}).`)
