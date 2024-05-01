@@ -2,8 +2,6 @@ const moment = require('moment')
 const Orders = require('../models/orders.model')
 const mongoose = require('mongoose')
 const _ = require('lodash')
-const logger = require('../utils/logger')
-require('moment-timezone')
 
 module.exports.getOrder = async () => {
   const orders = await Orders.find()
