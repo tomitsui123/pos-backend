@@ -18,10 +18,10 @@ router.get('/:date', async (req, res, next) => {
     var orders = await getOrderByDate(date)
     const total = orders.reduce((acc, cur) => {
       const { itemList } = cur
-      cur.total = itemList.reduce((acc, cur) => {
-        return acc + cur.price
+      const _total = itemList.reduce((acc1, cur1) => {
+        return acc1 + cur1.menuProperty.price * cur1.amount
       }, 0)
-      return acc + cur.total
+      return acc + _total
     }, 0)
     if (orders instanceof Error) {
       logger.info(orders)
