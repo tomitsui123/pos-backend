@@ -4,9 +4,10 @@ const path = require('path')
 const cookieParser = require('cookie-parser')
 const bodyParser = require('body-parser')
 const mongoose = require('mongoose')
+const expressWinston = require('express-winston')
+const winston = require('winston')
 
 const indexRouter = require('./routes/index.route')
-const { logToDatabase } = require('./middlewares/logging.middleware')
 
 const logger = require('./utils/logger')
 
@@ -35,7 +36,6 @@ app.use(expressWinston.logger({
 }))
 app.use(cookieParser())
 app.use(express.static(path.join(__dirname, 'public')))
-app.use(logToDatabase)
 app.use('/api', indexRouter)
 // TODO: add error log
 
