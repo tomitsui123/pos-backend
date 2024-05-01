@@ -27,7 +27,7 @@ router.get('/:date', async (req, res, next) => {
       logger.info(orders)
       orders = null
     }
-    return res.send(orders ? orders : [])
+    return res.send({ orders: orders ? orders : [], totalSales: total })
   } catch (e) {
     return next(e)
   }
