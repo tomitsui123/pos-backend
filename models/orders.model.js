@@ -44,7 +44,7 @@ const orderSchema = new mongoose.Schema({
   deletedAt: { type: Date, default: null },
   createdAt: { type: Date, default: moment() },
   updatedAt: { type: Date, default: moment() },
-  orderNumber: { type: Number, unique: true },
+  orderNumber: { type: Number },
   isTakeAway: Boolean
 })
 
