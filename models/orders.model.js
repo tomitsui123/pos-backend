@@ -26,6 +26,7 @@ const itemSchema = new mongoose.Schema({
   amount: Number,
   price: Number,
   remarkList: [{
+    _id: false,
     content: String,
     title: String
   }],

@@ -36,6 +36,7 @@ router.get('/:date', async (req, res, next) => {
 router.post('/', upload.array(), async (req, res) => {
   try {
     await createOrder(req.body)
+    return res.send({ message: 'order created' })
   } catch (error) {
     logger.error(error.message)
     return res.status(500).send({ message: 'order cannot be created' })
