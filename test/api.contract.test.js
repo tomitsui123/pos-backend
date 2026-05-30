@@ -69,6 +69,16 @@ describe('API contract', () => {
     expect(response.body).toEqual({ recipe: [], options: [] })
   })
 
+  test('POST /api/recipe rejects invalid payloads', async () => {
+    const response = await request(app)
+      .post('/api/recipe')
+      .set('Authorization', 'Bearer device-token')
+      .send({ itemCode: 'A1', displayName: '', price: -1, category: 'Rice' })
+      .expect(400)
+
+    expect(response.body.message).toBe('displayName is required')
+  })
+
   test('POST /api/order rejects missing auth', async () => {
     const response = await request(app)
       .post('/api/order')

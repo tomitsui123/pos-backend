@@ -30,8 +30,10 @@ const notFound = (_req, res, _next) => {
 }
 
 router.use((err, _req, res, _next) => {
-  logger.error(err.stack || err.message)
   const status = err.status || 500
+  if (status >= 500) {
+    logger.error(err.stack || err.message)
+  }
   res.status(status).json({
     message: status >= 500 && process.env.NODE_ENV === 'production' ? 'Internal server error' : err.message,
   })
