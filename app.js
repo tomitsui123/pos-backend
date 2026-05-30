@@ -6,13 +6,21 @@ const bodyParser = require('body-parser')
 const mongoose = require('mongoose')
 const expressWinston = require('express-winston')
 const winston = require('winston')
+const helmet = require('helmet')
+const cors = require('cors')
 
 const indexRouter = require('./routes/index.route')
 
 const logger = require('./utils/logger')
+const { validateEnv } = require('./config/env')
 
 const app = express()
 
+validateEnv()
+app.use(helmet())
+app.use(cors({
+  origin: process.env.CORS_ORIGIN ? process.env.CORS_ORIGIN.split(',') : false
+}))
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({
   extended: true
@@ -40,20 +48,20 @@ app.use('/api', indexRouter)
 // TODO: add error log
 
 const host = process.env.NODE_ENV === 'production' ? 'shop-mongo' : process.env.MONGODB_HOST
-if (process.env.NODE_ENV === 'production') {
-}
 logger.info(`current TZ: ${process.env.TZ}`)
-mongoose.connect(
-  `mongodb://${host}:${process.env.MONGODB_PORT}/pos`,
-  {
-    authSource: 'admin',
-    user: process.env.MONGODB_ROOT_USERNAME,
-    pass: process.env.MONGODB_ROOT_PASSWORD
-  }
-)
+if (process.env.NODE_ENV !== 'test') {
+  mongoose.connect(
+    `mongodb://${host}:${process.env.MONGODB_PORT}/pos`,
+    {
+      authSource: 'admin',
+      user: process.env.MONGODB_ROOT_USERNAME,
+      pass: process.env.MONGODB_ROOT_PASSWORD
+    }
+  )
 
-  .then((() => logger.info('MongoDB connected')))
-  .catch(err => logger.error(err))
+    .then((() => logger.info('MongoDB connected')))
+    .catch(err => logger.error(err))
+}
 require('./models/index')
 
 module.exports = app

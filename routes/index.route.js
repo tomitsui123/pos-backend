@@ -9,13 +9,20 @@ router.use('/recipe', recipeRouter)
 router.use('/order', orderRouter)
 router.use('/user', userRouter)
 
+const healthPayload = () => ({
+  status: 'ok',
+  currentVersion: process.env.VERSION,
+  updatedAt: process.env.UPDATED_AT,
+  environment: process.env.NODE_ENV || 'development'
+})
+
+router.get('/health', function (_req, res, _next) {
+  return res.json(healthPayload())
+})
+
 router.get('/', function (_req, res, _next) {
   logger.info('API is up and running')
-  return res.json({
-    currentVersion: process.env.VERSION,
-    updatedAt: process.env.UPDATED_AT,
-    currentEnvironment: process.env.NODE_ENV || 'development'
-  })
+  return res.json(healthPayload())
 })
 
 const notFound = (_req, res, _next) => {
@@ -23,9 +30,10 @@ const notFound = (_req, res, _next) => {
 }
 
 router.use((err, _req, res, _next) => {
-  console.error(err.stack)
-  res.status(500).json({
-    message: err.message,
+  logger.error(err.stack || err.message)
+  const status = err.status || 500
+  res.status(status).json({
+    message: status >= 500 && process.env.NODE_ENV === 'production' ? 'Internal server error' : err.message,
   })
 })
 

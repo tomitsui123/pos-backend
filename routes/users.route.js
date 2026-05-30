@@ -1,14 +1,22 @@
 var express = require('express')
 const jwt = require('jsonwebtoken')
 const logger = require('../utils/logger')
+const rateLimit = require('express-rate-limit')
 var router = express.Router()
+
+const authLimiter = rateLimit({
+  windowMs: 60 * 1000,
+  limit: 10,
+  standardHeaders: true,
+  legacyHeaders: false,
+})
 
 /* GET users listing. */
 router.get('/', function (req, res, next) {
   res.send('respond with a resource hello world')
 })
 
-router.post('/verify', async function (req, res, next) {
+router.post('/verify', authLimiter, async function (req, res, next) {
   if (req.body.password !== process.env.CONTROL_PANEL_PASSWORD) {
     const error = new Error("Wrong password")
     return next(error)

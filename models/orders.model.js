@@ -34,18 +34,26 @@ const itemSchema = new mongoose.Schema({
 })
 
 const orderSchema = new mongoose.Schema({
+  clientOrderId: { type: String, unique: true, sparse: true },
   itemList: { type: [itemSchema], required: true },
   totalAmount: Number,
-  telephone: { type: Number, default: null },
+  total: Number,
+  telephone: { type: String, default: '' },
   priority: { type: Number, default: 0 },
   paid: { type: Boolean, default: false },
   remarks: Array,
   isTakeAway: { type: Boolean, default: false },
+  isDomesticHelper: { type: Boolean, default: false },
+  aluminiumPaper: { type: Boolean, default: false },
+  ownBox: { type: Boolean, default: false },
+  withoutTableware: { type: Boolean, default: false },
+  sitLocation: { type: String, default: '' },
+  prevOrder: { type: Number, default: 0 },
+  syncVersion: { type: Number, default: 1 },
   deletedAt: { type: Date, default: null },
   createdAt: { type: Date, default: moment() },
   updatedAt: { type: Date, default: moment() },
   orderNumber: { type: Number },
-  isTakeAway: Boolean
 })
 
 const momentFormat = schema => {

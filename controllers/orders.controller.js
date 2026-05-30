@@ -1,7 +1,62 @@
 const moment = require('moment')
 const Orders = require('../models/orders.model')
-const mongoose = require('mongoose')
-const _ = require('lodash')
+const httpError = require('../utils/httpError')
+
+const writableFields = [
+  'clientOrderId',
+  'itemList',
+  'totalAmount',
+  'total',
+  'telephone',
+  'priority',
+  'paid',
+  'remarks',
+  'deleted',
+  'deletedAt',
+  'createdAt',
+  'updatedAt',
+  'orderNumber',
+  'isTakeAway',
+  'isDomesticHelper',
+  'aluminiumPaper',
+  'ownBox',
+  'withoutTableware',
+  'sitLocation',
+  'prevOrder',
+]
+
+function normalizeOrderPayload(input) {
+  if (!input || !Array.isArray(input.itemList)) {
+    throw httpError(400, 'itemList is required')
+  }
+
+  const invalidKey = Object.keys(input).find(key => !writableFields.includes(key))
+  if (invalidKey) {
+    throw httpError(400, `The key (${invalidKey}) is not allowed`)
+  }
+
+  return {
+    ...input,
+    telephone: input.telephone == null ? '' : String(input.telephone),
+    totalAmount: input.totalAmount != null ? input.totalAmount : input.total,
+    itemList: input.itemList.map(item => ({
+      ...item,
+      price: item.price != null ? item.price : item.menuProperty && item.menuProperty.price,
+    })),
+  }
+}
+
+function toSyncResponse(order, message) {
+  return {
+    message,
+    id: order._id.toString(),
+    clientOrderId: order.clientOrderId || '',
+    orderNumber: order.orderNumber,
+    createdAt: order.createdAt,
+    updatedAt: order.updatedAt,
+    syncVersion: order.syncVersion || 1,
+  }
+}
 
 module.exports.getOrder = async () => {
   const orders = await Orders.find()
@@ -14,7 +69,9 @@ module.exports.getOrderById = async (id) => {
 }
 
 module.exports.getOrderByDate = async (date) => {
-  if (!moment(date).isValid()) return Error('The date format is not correct')
+  if (!moment(date, 'YYYY-MM-DD', true).isValid()) {
+    throw httpError(400, 'The date format is not correct')
+  }
   const startDate = moment(`${date} 23:00:00`, 'YYYY-MM-DD HH:mm:ss')
   const endDate = moment(startDate).add(9, 'hours')
   const orders = await Orders.find({
@@ -27,41 +84,37 @@ module.exports.getOrderByDate = async (date) => {
 }
 
 module.exports.createOrder = async input => {
-  if (input instanceof Error) {
-    return input
-  }
-  const restructureInput = {
-    ...input, itemList: input.itemList.map(item => ({ ...item, price: item.menuProperty.price }))
-  }
-  const order = await Orders({ ...restructureInput })
-  const savedOrder = await order.save()
-  return savedOrder._id
+  const payload = normalizeOrderPayload(input)
+  const now = moment().toDate()
+  const query = payload.clientOrderId ? { clientOrderId: payload.clientOrderId } : { _id: undefined }
+  const savedOrder = await Orders.findOneAndUpdate(
+    query,
+    {
+      ...payload,
+      updatedAt: now,
+      $setOnInsert: { createdAt: payload.createdAt || now },
+      syncVersion: (input.syncVersion || 0) + 1,
+    },
+    { new: true, upsert: true, setDefaultsOnInsert: true }
+  )
+  return toSyncResponse(savedOrder, 'order created')
 }
 
 module.exports.updateOrder = async (id, updatedContent) => {
-  const checkUpdatedContent = checkedContent => {
-    const keyList = Object.keys(checkedContent)
-    for (let i = 0; i < keyList.length; i++) {
-      if (!['itemList', 'totalAmount',
-        'telephone', 'priority', 'paid',
-        'remarks', 'deleted', 'deletedAt', 'createdAt', 'updatedAt'].includes(keyList[i])) {
-        return keyList[i]
-      }
-    }
-    return true
+  const payload = normalizeOrderPayload(updatedContent)
+  const savedOrder = await Orders.findByIdAndUpdate(
+    id,
+    {
+      ...payload,
+      updatedAt: moment().toDate(),
+      $inc: { syncVersion: 1 },
+    },
+    { new: true }
+  )
+  if (!savedOrder) {
+    throw httpError(404, `The order(id:${id}) cannot be changed`)
   }
-  try {
-    const checking = checkUpdatedContent(updatedContent)
-    if (!checking) {
-      return new Error(`The key (${checking}) is not found`)
-    }
-    const updatedInfo = await Orders.updateOne({ _id: id }, { ...updatedContent, updatedAt: moment() })
-    if (!updatedInfo.n) {
-      return new Error(`The order(id:${id}) cannot be changed`)
-    }
-  } catch (e) {
-    next(e)
-  }
+  return toSyncResponse(savedOrder, 'order updated')
 }
 
 module.exports.revertOrder = async _id => {
@@ -76,12 +129,12 @@ module.exports.deleteOrder = async _id => {
   const checking = await Orders.findById(_id)
   const res = await Orders.delete({ _id })
   if (!res.n) {
-    return Error(`id ${_id} cannot be found.`)
+    throw httpError(404, `id ${_id} cannot be found.`)
   }
   if (!checking) {
-    return Error(`id ${_id} has been deleted.`)
-  } else {
-    checking.save()
+    throw httpError(404, `id ${_id} has been deleted.`)
   }
-  return Error(`deleted order(id: ${_id}).`)
+  return { message: `deleted order(id: ${_id}).`, id: _id }
 }
+
+module.exports.normalizeOrderPayload = normalizeOrderPayload

@@ -5,6 +5,6 @@ const { jwtVerify } = require('../middlewares/verifyJwt.middleware')
 
 router.get('/', getAllRecipe)
 router.put('/:id', jwtVerify, editRecipe)
-router.post('/', createNewItem)
+router.post('/', jwtVerify, createNewItem)
 
 module.exports = router
