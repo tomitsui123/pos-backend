@@ -30,19 +30,47 @@ function normalizeOrderPayload(input) {
     throw httpError(400, 'itemList is required')
   }
 
+  if (typeof input.clientOrderId !== 'string' || input.clientOrderId.trim() === '') {
+    throw httpError(400, 'clientOrderId is required')
+  }
+
   const invalidKey = Object.keys(input).find(key => !writableFields.includes(key))
   if (invalidKey) {
     throw httpError(400, `The key (${invalidKey}) is not allowed`)
   }
 
+  validateNonNegativeNumber(input.total, 'total')
+  validateNonNegativeNumber(input.totalAmount, 'totalAmount')
+
   return {
     ...input,
+    clientOrderId: input.clientOrderId.trim(),
     telephone: input.telephone == null ? '' : String(input.telephone),
     totalAmount: input.totalAmount != null ? input.totalAmount : input.total,
-    itemList: input.itemList.map(item => ({
-      ...item,
-      price: item.price != null ? item.price : item.menuProperty && item.menuProperty.price,
-    })),
+    itemList: input.itemList.map(normalizeOrderItem),
+  }
+}
+
+function validateNonNegativeNumber(value, fieldName) {
+  if (value != null && (typeof value !== 'number' || Number.isNaN(value) || value < 0)) {
+    throw httpError(400, `${fieldName} must be a non-negative number`)
+  }
+}
+
+function normalizeOrderItem(item, index) {
+  const amount = item && item.amount
+  if (typeof amount !== 'number' || Number.isNaN(amount) || amount <= 0) {
+    throw httpError(400, `itemList[${index}].amount must be a positive number`)
+  }
+
+  const price = item.price != null ? item.price : item.menuProperty && item.menuProperty.price
+  if (typeof price !== 'number' || Number.isNaN(price) || price < 0) {
+    throw httpError(400, `itemList[${index}].price must be a non-negative number`)
+  }
+
+  return {
+    ...item,
+    price,
   }
 }
 

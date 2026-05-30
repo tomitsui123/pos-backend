@@ -53,6 +53,37 @@ describe('orders controller sync contract', () => {
       .rejects.toMatchObject({ status: 400, message: 'itemList is required' })
   })
 
+  test('createOrder rejects empty clientOrderId because retries need a stable key', async () => {
+    await expect(createOrder({
+      clientOrderId: '',
+      itemList: [{ menuProperty: { price: 30 }, amount: 2 }],
+    }))
+      .rejects.toMatchObject({ status: 400, message: 'clientOrderId is required' })
+  })
+
+  test('createOrder rejects invalid item amount and price fields', async () => {
+    await expect(createOrder({
+      clientOrderId: 'client-1',
+      itemList: [{ menuProperty: { price: '30' }, amount: 0 }],
+    }))
+      .rejects.toMatchObject({ status: 400, message: 'itemList[0].amount must be a positive number' })
+
+    await expect(createOrder({
+      clientOrderId: 'client-1',
+      itemList: [{ menuProperty: { price: -1 }, amount: 1 }],
+    }))
+      .rejects.toMatchObject({ status: 400, message: 'itemList[0].price must be a non-negative number' })
+  })
+
+  test('createOrder rejects negative total fields', async () => {
+    await expect(createOrder({
+      clientOrderId: 'client-1',
+      itemList: [{ menuProperty: { price: 30 }, amount: 2 }],
+      total: -1,
+    }))
+      .rejects.toMatchObject({ status: 400, message: 'total must be a non-negative number' })
+  })
+
   test('updateOrder returns the standardized response shape', async () => {
     Orders.findByIdAndUpdate.mockResolvedValue({ ...savedOrder, syncVersion: 3 })
 
