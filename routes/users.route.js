@@ -1,15 +1,8 @@
 var express = require('express')
 const jwt = require('jsonwebtoken')
-const rateLimit = require('express-rate-limit')
 const httpError = require('../utils/httpError')
+const { authLimiter } = require('../config/rateLimit')
 var router = express.Router()
-
-const authLimiter = rateLimit({
-  windowMs: 60 * 1000,
-  limit: 10,
-  standardHeaders: true,
-  legacyHeaders: false,
-})
 
 /* GET users listing. */
 router.get('/', function (req, res, next) {

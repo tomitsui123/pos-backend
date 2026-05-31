@@ -4,6 +4,7 @@ const multer = require('multer')
 const upload = multer()
 const logger = require('../utils/logger')
 const { jwtVerify } = require('../middlewares/verifyJwt.middleware')
+const { writeLimiter } = require('../config/rateLimit')
 
 const { createOrder, getOrderByDate, updateOrder, deleteOrder, revertOrder } = require('../controllers/orders.controller')
 
@@ -49,7 +50,7 @@ router.get('/:date', async (req, res, next) => {
   }
 })
 
-router.post('/', jwtVerify, upload.array(), async (req, res, next) => {
+router.post('/', writeLimiter, jwtVerify, upload.array(), async (req, res, next) => {
   try {
     const response = await createOrder(req.body)
     return res.send(response)
@@ -60,7 +61,7 @@ router.post('/', jwtVerify, upload.array(), async (req, res, next) => {
 
 })
 
-router.post('/revert/:id', jwtVerify, async (req, res, next) => {
+router.post('/revert/:id', writeLimiter, jwtVerify, async (req, res, next) => {
   var { id } = req.params
   var out = await revertOrder(id)
   if (out instanceof Error) {
@@ -71,7 +72,7 @@ router.post('/revert/:id', jwtVerify, async (req, res, next) => {
 })
 
 
-router.put('/:id', jwtVerify, async (req, res, next) => {
+router.put('/:id', writeLimiter, jwtVerify, async (req, res, next) => {
   const { id } = req.params
   try {
     const out = await updateOrder(id, req.body)
@@ -81,7 +82,7 @@ router.put('/:id', jwtVerify, async (req, res, next) => {
   }
 })
 
-router.delete('/:id', jwtVerify, async (req, res, next) => {
+router.delete('/:id', writeLimiter, jwtVerify, async (req, res, next) => {
   const _id = req.params.id
   try {
     const response = await deleteOrder(_id)
