@@ -59,6 +59,12 @@ Use `example.env` as the starting point for the Compose environment. Production
 deployments should use real secrets from the host or deployment platform rather
 than committing `.env`.
 
+The Compose setup includes a MongoDB healthcheck and starts the backend only
+after Mongo responds to `ping`. Mongo is bound to `127.0.0.1:27017` on the host
+for local maintenance. Inside Compose, the backend explicitly uses
+`MONGODB_HOST=shop-mongo` and `PORT=80`, even if a local `.env` uses different
+values for non-Docker development.
+
 ## API Contract
 
 The shared mobile/backend contract is documented in

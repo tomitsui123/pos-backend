@@ -14,6 +14,7 @@ const indexRouter = require('./routes/index.route')
 const logger = require('./utils/logger')
 const { validateEnv } = require('./config/env')
 const { buildCorsOptions } = require('./config/cors')
+const { buildMongoOptions, buildMongoUri } = require('./config/mongo')
 
 const app = express()
 
@@ -46,17 +47,9 @@ app.use(express.static(path.join(__dirname, 'public')))
 app.use('/api', indexRouter)
 // TODO: add error log
 
-const host = process.env.MONGODB_HOST
 logger.info(`current TZ: ${process.env.TZ}`)
 if (process.env.NODE_ENV !== 'test') {
-  mongoose.connect(
-    `mongodb://${host}:${process.env.MONGODB_PORT}/${process.env.MONGODB_DB}`,
-    {
-      authSource: 'admin',
-      user: process.env.MONGODB_ROOT_USERNAME,
-      pass: process.env.MONGODB_ROOT_PASSWORD
-    }
-  )
+  mongoose.connect(buildMongoUri(), buildMongoOptions())
 
     .then((() => logger.info('MongoDB connected')))
     .catch(err => logger.error(err))
