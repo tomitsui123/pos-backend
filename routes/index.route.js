@@ -29,7 +29,7 @@ const notFound = (_req, res, _next) => {
   res.status(404).send({ message: 'API not found' })
 }
 
-router.use((err, _req, res, _next) => {
+function errorHandler(err, _req, res, _next) {
   const status = err.status || 500
   if (status >= 500) {
     logger.error(err.stack || err.message)
@@ -37,7 +37,9 @@ router.use((err, _req, res, _next) => {
   res.status(status).json({
     message: status >= 500 && process.env.NODE_ENV === 'production' ? 'Internal server error' : err.message,
   })
-})
+}
+
+router.use(errorHandler)
 
 router.get('*', notFound)
 router.post('*', notFound)
@@ -45,3 +47,4 @@ router.put('*', notFound)
 router.delete('*', notFound)
 
 module.exports = router
+module.exports.errorHandler = errorHandler
