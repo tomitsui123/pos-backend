@@ -13,14 +13,13 @@ const indexRouter = require('./routes/index.route')
 
 const logger = require('./utils/logger')
 const { validateEnv } = require('./config/env')
+const { buildCorsOptions } = require('./config/cors')
 
 const app = express()
 
 validateEnv()
 app.use(helmet())
-app.use(cors({
-  origin: process.env.CORS_ORIGIN ? process.env.CORS_ORIGIN.split(',') : false
-}))
+app.use(cors(buildCorsOptions()))
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({
   extended: true
