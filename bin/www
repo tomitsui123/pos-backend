@@ -5,11 +5,7 @@ var debug = require('debug')('backend:server')
 var http = require('http')
 const logger = require('../utils/logger')
 
-let exposePort = 80
-if (process.env.NODE_ENV !== 'production') {
-  exposePort = process.env.DEV_PORT
-}
-var port = normalizePort(exposePort)
+var port = normalizePort(process.env.PORT)
 app.set('port', port)
 
 var server = http.createServer(app)

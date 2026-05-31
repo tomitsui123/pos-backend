@@ -18,14 +18,14 @@ cp example.env .env
 npm start
 ```
 
-For local development, set `DEV_PORT=8080` and point the mobile app at
+For local development, set `PORT=8080` and point the mobile app at
 `http://10.0.2.2:8080/api/` for Android emulator testing.
 
 ## Environment
 
 | Variable | Required | Notes |
 | --- | --- | --- |
-| `DEV_PORT` | Yes | HTTP port for the Express server. |
+| `PORT` | Yes | HTTP port for the Express server behind the local or reverse-proxy listener. |
 | `MONGODB_ROOT_USERNAME` | Yes | MongoDB username. |
 | `MONGODB_ROOT_PASSWORD` | Yes | MongoDB password. |
 | `MONGODB_HOST` | Yes | MongoDB host or service name. |
