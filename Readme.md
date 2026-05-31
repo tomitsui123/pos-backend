@@ -91,6 +91,9 @@ Run the Node process behind an HTTPS reverse proxy such as Nginx, Caddy, Traefik
 or a managed load balancer. Terminate TLS at the proxy, forward the original
 client IP headers, and keep plain HTTP limited to private infrastructure.
 
+To run a side-by-side v2 backend deployment, see
+[`docs/DEPLOY_V2.md`](docs/DEPLOY_V2.md).
+
 Recommended production controls:
 
 - Set `NODE_ENV=production`.

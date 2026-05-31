@@ -1,0 +1,43 @@
+services:
+  shop-mongo-v2:
+    env_file:
+      - example.v2.env
+    image: mongo:latest
+    container_name: shop-mongo-v2
+    ports:
+      - 127.0.0.1:27018:27017
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGODB_ROOT_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGODB_ROOT_PASSWORD}
+    volumes:
+      - ./data-v2:/data/db
+      - ./docker-entrypoint-initdb.d/mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
+    healthcheck:
+      test: ["CMD-SHELL", "mongosh --quiet --username \"$${MONGO_INITDB_ROOT_USERNAME}\" --password \"$${MONGO_INITDB_ROOT_PASSWORD}\" --authenticationDatabase admin --eval \"db.adminCommand('ping').ok\" localhost:27017/admin | grep 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 20s
+
+  shop-pos-backend-v2:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: shop-pos-backend-v2
+    volumes:
+      - ./:/usr/src/app/
+    ports:
+      - 8082:80
+    restart: always
+    depends_on:
+      shop-mongo-v2:
+        condition: service_healthy
+    env_file:
+      - example.v2.env
+    environment:
+      PORT: 80
+      MONGODB_HOST: shop-mongo-v2
+      MONGODB_PORT: 27017
+      MONGO_INITDB_ROOT_USERNAME: ${MONGODB_ROOT_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGODB_ROOT_PASSWORD}
