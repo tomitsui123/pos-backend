@@ -1,7 +1,7 @@
 var express = require('express')
 const jwt = require('jsonwebtoken')
-const logger = require('../utils/logger')
 const rateLimit = require('express-rate-limit')
+const httpError = require('../utils/httpError')
 var router = express.Router()
 
 const authLimiter = rateLimit({
@@ -18,8 +18,7 @@ router.get('/', function (req, res, next) {
 
 router.post('/verify', authLimiter, async function (req, res, next) {
   if (req.body.password !== process.env.CONTROL_PANEL_PASSWORD) {
-    const error = new Error("Wrong password")
-    return next(error)
+    return next(httpError(401, 'Unauthorized'))
   }
   let token
   try {
@@ -42,16 +41,6 @@ router.post('/verify', authLimiter, async function (req, res, next) {
       success: true,
       data: { token },
     })
-})
-
-router.post('/login', function (req, res, next) {
-  logger.info(req.body)
-  const { staffId } = req.body
-  if (staffId == '11111111') {
-    return res.send('login success')
-  } else {
-    return res.send('login fail')
-  }
 })
 
 module.exports = router

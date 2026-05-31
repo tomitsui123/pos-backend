@@ -79,6 +79,24 @@ describe('API contract', () => {
     expect(response.body.message).toBe('displayName is required')
   })
 
+  test('POST /api/user/verify rejects wrong control-panel passwords with 401', async () => {
+    const response = await request(app)
+      .post('/api/user/verify')
+      .send({ password: 'wrong' })
+      .expect(401)
+
+    expect(response.body.message).toBe('Unauthorized')
+  })
+
+  test('legacy staff login endpoint is not exposed', async () => {
+    const response = await request(app)
+      .post('/api/user/login')
+      .send({ staffId: '11111111' })
+      .expect(404)
+
+    expect(response.body.message).toBe('API not found')
+  })
+
   test('POST /api/order rejects missing auth', async () => {
     const response = await request(app)
       .post('/api/order')
