@@ -30,7 +30,16 @@ app.use(helmet({
         'https://ajax.googleapis.com',
         'https://cdnjs.cloudflare.com',
       ],
+      'script-src-elem': [
+        "'self'",
+        "'unsafe-inline'",
+        'https://cdn.jsdelivr.net',
+        'https://ajax.googleapis.com',
+        'https://cdnjs.cloudflare.com',
+      ],
       'img-src': ["'self'", 'data:', 'http:', 'https:'],
+      'connect-src': ["'self'", 'https://cdnjs.cloudflare.com'],
+      'upgrade-insecure-requests': null,
     },
   },
 }))

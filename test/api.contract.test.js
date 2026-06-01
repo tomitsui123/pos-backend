@@ -73,8 +73,10 @@ describe('API contract', () => {
     const response = await request(app).get('/control-panel.html').expect(200)
 
     expect(response.headers['content-security-policy']).toEqual(expect.stringContaining('script-src'))
+    expect(response.headers['content-security-policy']).toEqual(expect.stringContaining('script-src-elem'))
     expect(response.headers['content-security-policy']).toEqual(expect.stringContaining('https://ajax.googleapis.com'))
     expect(response.headers['content-security-policy']).toEqual(expect.stringContaining("'unsafe-inline'"))
+    expect(response.headers['content-security-policy']).not.toEqual(expect.stringContaining('upgrade-insecure-requests'))
   })
 
   test('POST /api/recipe rejects invalid payloads', async () => {
