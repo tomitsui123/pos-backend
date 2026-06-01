@@ -48,11 +48,14 @@ app.use('/api', indexRouter)
 // TODO: add error log
 
 logger.info(`current TZ: ${process.env.TZ}`)
+app.locals.mongoReady = Promise.resolve()
 if (process.env.NODE_ENV !== 'test') {
-  mongoose.connect(buildMongoUri(), buildMongoOptions())
-
+  app.locals.mongoReady = mongoose.connect(buildMongoUri(), buildMongoOptions())
     .then((() => logger.info('MongoDB connected')))
-    .catch(err => logger.error(err))
+    .catch(err => {
+      logger.error(err)
+      throw err
+    })
 }
 require('./models/index')
 
