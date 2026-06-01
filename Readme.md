@@ -65,6 +65,10 @@ for local maintenance. Inside Compose, the backend explicitly uses
 `MONGODB_HOST=shop-mongo` and `PORT=80`, even if a local `.env` uses different
 values for non-Docker development.
 
+The backend service runs from the built Docker image and does not bind-mount the
+source directory, so image-installed dependencies such as `dotenv` are preserved
+at runtime.
+
 ## API Contract
 
 The shared mobile/backend contract is documented in

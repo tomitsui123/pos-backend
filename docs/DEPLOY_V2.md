@@ -14,6 +14,10 @@ POS devices are switched over.
 - Mongo host port: `127.0.0.1:27018`
 - Mongo data directory: `data-v2`
 
+The backend container does not bind-mount the source directory in v2. Dependencies
+are installed into the Docker image during `docker compose ... up --build`; this
+prevents host files from hiding image `node_modules`.
+
 ## Prepare Env
 
 ```console

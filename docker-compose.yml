@@ -24,8 +24,6 @@ services:
       context: .
       dockerfile: Dockerfile 
     container_name: shop-pos-backend
-    volumes:
-      - ./:/usr/src/app/
     ports:
       - 8080:80
     restart: always
