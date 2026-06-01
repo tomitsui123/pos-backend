@@ -27,9 +27,9 @@ cp example.v2.env .env.v2
 Edit `.env.v2` and replace every `replace-with-*` value. Use a new
 `API_DEVICE_TOKEN` if you want v2 devices to authenticate separately from v1.
 
-`docker-compose.v2.yml` uses `example.v2.env` as a safe default `env_file` so
-Compose can be validated before secrets exist. Runtime values are supplied by
-`--env-file .env.v2` in the commands below.
+`docker-compose.v2.yml` reads runtime values from the `--env-file .env.v2`
+argument in the commands below. Do not run v2 with `example.v2.env`; that file
+contains placeholders only.
 
 The backend container is forced by Compose to use:
 
@@ -42,6 +42,16 @@ MONGODB_PORT=27017
 ## Start v2
 
 ```console
+docker compose --env-file .env.v2 -f docker-compose.v2.yml -p pos-v2 up -d --build
+```
+
+If Mongo was already initialized with placeholder credentials or different
+credentials during a failed test deployment, reset the v2 test database before
+starting again:
+
+```console
+docker compose --env-file .env.v2 -f docker-compose.v2.yml -p pos-v2 down
+rm -rf data-v2
 docker compose --env-file .env.v2 -f docker-compose.v2.yml -p pos-v2 up -d --build
 ```
 

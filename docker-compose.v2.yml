@@ -1,7 +1,5 @@
 services:
   shop-mongo-v2:
-    env_file:
-      - example.v2.env
     image: mongo:latest
     container_name: shop-mongo-v2
     ports:
@@ -31,11 +29,20 @@ services:
     depends_on:
       shop-mongo-v2:
         condition: service_healthy
-    env_file:
-      - example.v2.env
     environment:
       PORT: 80
       MONGODB_HOST: shop-mongo-v2
       MONGODB_PORT: 27017
+      MONGODB_DB: ${MONGODB_DB}
+      MONGODB_ROOT_USERNAME: ${MONGODB_ROOT_USERNAME}
+      MONGODB_ROOT_PASSWORD: ${MONGODB_ROOT_PASSWORD}
+      VERSION: ${VERSION}
+      UPDATED_AT: ${UPDATED_AT}
+      NODE_ENV: ${NODE_ENV}
+      CONTROL_PANEL_PASSWORD: ${CONTROL_PANEL_PASSWORD}
+      JWT_SECRET: ${JWT_SECRET}
+      API_DEVICE_TOKEN: ${API_DEVICE_TOKEN}
+      CORS_ORIGIN: ${CORS_ORIGIN}
+      TZ: ${TZ}
       MONGO_INITDB_ROOT_USERNAME: ${MONGODB_ROOT_USERNAME}
       MONGO_INITDB_ROOT_PASSWORD: ${MONGODB_ROOT_PASSWORD}
