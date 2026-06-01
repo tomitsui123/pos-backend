@@ -19,7 +19,21 @@ const { buildMongoOptions, buildMongoUri } = require('./config/mongo')
 const app = express()
 
 validateEnv()
-app.use(helmet())
+app.use(helmet({
+  contentSecurityPolicy: {
+    directives: {
+      ...helmet.contentSecurityPolicy.getDefaultDirectives(),
+      'script-src': [
+        "'self'",
+        "'unsafe-inline'",
+        'https://cdn.jsdelivr.net',
+        'https://ajax.googleapis.com',
+        'https://cdnjs.cloudflare.com',
+      ],
+      'img-src': ["'self'", 'data:', 'http:', 'https:'],
+    },
+  },
+}))
 app.use(cors(buildCorsOptions()))
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({

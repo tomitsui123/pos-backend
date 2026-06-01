@@ -69,6 +69,14 @@ describe('API contract', () => {
     expect(response.body).toEqual({ recipe: [], options: [] })
   })
 
+  test('GET /control-panel.html allows legacy panel scripts', async () => {
+    const response = await request(app).get('/control-panel.html').expect(200)
+
+    expect(response.headers['content-security-policy']).toEqual(expect.stringContaining('script-src'))
+    expect(response.headers['content-security-policy']).toEqual(expect.stringContaining('https://ajax.googleapis.com'))
+    expect(response.headers['content-security-policy']).toEqual(expect.stringContaining("'unsafe-inline'"))
+  })
+
   test('POST /api/recipe rejects invalid payloads', async () => {
     const response = await request(app)
       .post('/api/recipe')
